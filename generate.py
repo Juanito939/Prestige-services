@@ -37,12 +37,8 @@ SERVICES = [
         "slug": "business-plan",
         "title": "Business plan simple",
         "short": "Un business plan clair pour présenter votre projet à une banque, une coopérative ou un partenaire.",
-        "price": "1 000 – 5 000 FCFA",
-        "tiers": [
-            ("Léger", "Note de synthèse, 1-2 pages (présentation + chiffres clés)", "1 000 FCFA"),
-            ("Standard", "Business plan complet, 4-6 pages (projet, marché, prévisionnel simplifié)", "3 000 FCFA"),
-            ("Complet", "Business plan détaillé, 8-10 pages avec prévisionnel sur 3 ans", "5 000 FCFA"),
-        ],
+        "price": "Sur devis",
+        "negotiable": True,
         "hero_desc": "Un document structuré (présentation du projet, marché, prévisionnel financier simplifié) pour appuyer une demande de financement ou clarifier votre projet.",
         "fields": [
             ("nom", "text", "Nom complet", True, None, None),
@@ -50,9 +46,14 @@ SERVICES = [
             ("email", "email", "Adresse email", True, None, None),
             ("nom_projet", "text", "Nom du projet / de l'activité", True, None, None),
             ("secteur", "text", "Secteur d'activité", True, None, None),
-            ("description_activite", "textarea", "Décrivez votre activité et votre objectif", True, "Que vendez-vous, à qui, et pourquoi ce projet ?", None),
-            ("budget_estime", "text", "Budget de démarrage estimé (FCFA)", False, None, None),
+            ("description_activite", "textarea", "Décrivez votre activité", True, "Que vendez-vous ou proposez-vous, et à qui ?", None),
+            ("porteur_projet", "textarea", "Votre parcours en lien avec ce projet", False, "Formation, expérience professionnelle, projets similaires déjà menés", None),
+            ("marche_clientele", "textarea", "Marché visé et clientèle", True, "Qui sont vos clients, où se trouvent-ils, pourquoi choisiraient-ils votre offre ?", None),
+            ("concurrence", "text", "Concurrence existante dans votre zone", False, "Optionnel", None),
+            ("budget_estime", "textarea", "Détail du budget de démarrage (FCFA)", True, "Matériel, stock, local, autres frais de lancement — même approximatif", None),
+            ("revenus_prevus", "textarea", "Recettes prévues (par mois ou par an)", False, "Estimation du chiffre d'affaires attendu, même approximative", None),
             ("objectif", "select", "Ce document servira surtout à", True, None, ["Demande de financement bancaire", "Dossier coopérative / microfinance", "Usage personnel / clarifier le projet", "Autre"]),
+            ("delai", "select", "Délai souhaité", False, None, ["Standard (le jour même)", "Urgent (moins de 2h)"]),
         ],
     },
     {
@@ -121,15 +122,31 @@ SERVICES = [
         ],
     },
     {
+        "slug": "rapports",
+        "title": "Rédaction de rapports",
+        "short": "Rapport de stage, d'activité ou professionnel, rédigé et structuré selon les attentes de votre école ou employeur.",
+        "price": "Sur devis",
+        "negotiable": True,
+        "hero_desc": "Rapport de stage, rapport d'activité ou rapport professionnel, rédigé et structuré selon les attentes de votre école ou de votre employeur — livré en PDF et en Word, prêt à remettre.",
+        "fields": [
+            ("nom", "text", "Nom complet", True, None, None),
+            ("telephone", "tel", "Téléphone / WhatsApp", True, None, None),
+            ("email", "email", "Adresse email", True, None, None),
+            ("type_rapport", "select", "Type de rapport", True, None, ["Rapport de stage", "Rapport d'activité", "Rapport professionnel", "Autre"]),
+            ("structure_organisme", "text", "Nom de l'entreprise / structure concernée", True, None, None),
+            ("periode", "text", "Période couverte", True, "Dates de début et de fin du stage ou de l'activité", None),
+            ("missions_realisees", "textarea", "Missions et tâches réalisées", True, "Décrivez ce que vous avez fait, même en vrac — nous mettrons en forme", None),
+            ("observations", "textarea", "Observations, difficultés rencontrées, points à souligner", False, None, None),
+            ("nb_pages", "text", "Nombre de pages souhaité", False, None, None),
+            ("delai", "select", "Délai souhaité", False, None, ["Standard (le jour même)", "Urgent (moins de 2h)"]),
+        ],
+    },
+    {
         "slug": "reseaux-sociaux",
         "title": "Gestion de pages réseaux sociaux",
         "short": "Calendrier de contenu, textes et visuels simples pour faire vivre vos pages.",
-        "price": "1 000 – 5 000 FCFA / mois",
-        "tiers": [
-            ("Léger", "4 publications/mois (textes uniquement)", "1 000 FCFA/mois"),
-            ("Standard", "8 publications/mois (textes + visuels simples)", "3 000 FCFA/mois"),
-            ("Complet", "12 publications/mois + calendrier de contenu", "5 000 FCFA/mois"),
-        ],
+        "price": "Sur devis",
+        "negotiable": True,
         "hero_desc": "Un calendrier de publications, la rédaction des textes et des visuels simples pour animer régulièrement vos pages, sans avoir à y penser chaque jour.",
         "fields": [
             ("nom", "text", "Nom complet", True, None, None),
@@ -409,9 +426,37 @@ def tiers_html(tiers):
     return rows
 
 
+CANEVAS_FIELD = (
+    "canevas", "textarea",
+    "Avez-vous un canevas ou une structure particulière à respecter ?",
+    False,
+    "Optionnel — si votre école, votre employeur ou vous-même avez un modèle imposé, décrivez-le ou collez son plan ici. Sans précision, nous choisirons la structure la plus adaptée à votre document.",
+    None,
+)
+
+
+def pricing_block_html(s):
+    if s.get("negotiable"):
+        return """<div class="section-head">
+        <span class="eyebrow">Tarif négocié</span>
+        <h2>Combien ça coûte</h2>
+        <p class="small">Ce service dépend trop de votre projet pour un tarif fixe. Décrivez votre besoin dans le formulaire ci-dessous, un tarif vous sera proposé avant tout paiement — vous restez libre de l'accepter ou d'en discuter.</p>
+      </div>
+      <div class="note-box" style="margin-bottom:44px;">
+        <strong>Tarif sur devis :</strong> après votre commande, vous recevez une proposition de prix par WhatsApp. Le travail ne démarre qu'après votre accord et le paiement.
+      </div>"""
+    return """<div class="section-head">
+        <span class="eyebrow">Tarif selon le volume</span>
+        <h2>Combien ça coûte</h2>
+        <p class="small">Le tarif dépend du volume de travail (nombre de pages, de fiches ou de publications selon le service). Précisez votre besoin dans le formulaire ci-dessous, le tarif exact vous sera confirmé avant paiement.</p>
+      </div>
+      <div class="receipt" style="margin-bottom:44px;">{tiers}
+      </div>""".format(tiers=tiers_html(s["tiers"]))
+
+
 def page_service(s):
     prefix = "../"
-    fields_html = "\n".join(field_html(*f) for f in s["fields"])
+    fields_html = "\n".join(field_html(*f) for f in s["fields"] + [CANEVAS_FIELD])
     others = [x for x in SERVICES if x["slug"] != s["slug"]][:3]
     others_html = ""
     for o in others:
@@ -435,13 +480,7 @@ def page_service(s):
 
   <section>
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Tarif selon le volume</span>
-        <h2>Combien ça coûte</h2>
-        <p class="small">Le tarif dépend du volume de travail (nombre de pages, de fiches ou de publications selon le service). Précisez votre besoin dans le formulaire ci-dessous, le tarif exact vous sera confirmé avant paiement.</p>
-      </div>
-      <div class="receipt" style="margin-bottom:44px;">{tiers}
-      </div>
+      {pricing_block}
     </div>
   </section>
 
@@ -507,7 +546,7 @@ def page_service(s):
     </div>
   </section>
 </main>
-""".format(title=s["title"], hero_desc=s["hero_desc"], price=s["price"], fields=fields_html, others=others_html, tiers=tiers_html(s["tiers"]))
+""".format(title=s["title"], hero_desc=s["hero_desc"], price=s["price"], fields=fields_html, others=others_html, pricing_block=pricing_block_html(s))
 
     write("services/{}.html".format(s["slug"]),
           head(s["title"], s["short"], prefix) + header_nav("services.html", prefix) + body + footer(prefix))
